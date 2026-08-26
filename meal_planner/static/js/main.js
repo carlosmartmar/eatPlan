@@ -11,9 +11,16 @@ const app = {
         this.fetchStats();
     },
 
-    navigate(viewId) {
+    navigate(viewId, btnElement = null) {
+        // Handle views
         document.querySelectorAll('.view').forEach(el => el.classList.remove('active'));
         document.getElementById(`view-${viewId}`).classList.add('active');
+
+        // Handle sidebar nav active states
+        if (btnElement) {
+            document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
+            btnElement.classList.add('active');
+        }
 
         // Trigger specific loads based on view
         if (viewId === 'dashboard') this.fetchStats();
@@ -176,9 +183,15 @@ const app = {
 
         document.getElementById('stat-carlos-plan').textContent = stats.carlos_plan;
         document.getElementById('stat-almu-plan').textContent = stats.almu_plan;
-        document.getElementById('stat-recipes').textContent = stats.recipes;
-        document.getElementById('stat-ingredients').textContent = stats.ingredients;
-        document.getElementById('stat-shopping').textContent = stats.shopping_items;
+
+        const recTop = document.getElementById('stat-recipes-top');
+        if (recTop) recTop.textContent = stats.recipes;
+
+        const ingTop = document.getElementById('stat-ingredients-top');
+        if (ingTop) ingTop.textContent = stats.ingredients;
+
+        const shopTop = document.getElementById('stat-shopping-top');
+        if (shopTop) shopTop.textContent = stats.shopping_items;
     },
 
     async renderPlan() {
