@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Planificación Semanal</title>
+    <!-- Google Fonts: Pixelify Sans for headers and Roboto for clean sans-serif text -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400;500;700&family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+    <header class="app-header">
+        <h1 class="main-title">PLANIFICACIÓN SEMANAL</h1>
+        <nav class="main-nav">
+            <button onclick="app.navigate('dashboard')" class="nav-btn">Dashboard</button>
+            <button onclick="app.navigate('plan')" class="nav-btn">Plan Semanal</button>
+            <button onclick="app.navigate('recipes')" class="nav-btn">Recetas</button>
+            <button onclick="app.navigate('ingredients')" class="nav-btn">Ingredientes</button>
+            <button onclick="app.navigate('shopping')" class="nav-btn">Lista de Compra</button>
+        </nav>
+    </header>
+
+    <main class="app-content">
+        <!-- Dashboard View -->
+        <section id="view-dashboard" class="view active">
+            <div class="dashboard-grid">
+                <!-- Highlight Cards -->
+                <div class="card highlight-card carlos-card">
+                    <h2 class="card-title">PLAN CARLOS</h2>
+                    <p class="stat-value" id="stat-carlos-plan">0</p>
+                    <p class="stat-label">Comidas planificadas</p>
+                </div>
+                <div class="card highlight-card almu-card">
+                    <h2 class="card-title">PLAN ALMU</h2>
+                    <p class="stat-value" id="stat-almu-plan">0</p>
+                    <p class="stat-label">Comidas planificadas</p>
+                </div>
+
+                <!-- Secondary Stats -->
+                <div class="card stat-card">
+                    <h3 class="stat-card-title">Recetas</h3>
+                    <p class="stat-value" id="stat-recipes">0</p>
+                </div>
+                <div class="card stat-card">
+                    <h3 class="stat-card-title">Ingredientes</h3>
+                    <p class="stat-value" id="stat-ingredients">0</p>
+                </div>
+                <div class="card stat-card">
+                    <h3 class="stat-card-title">Por comprar</h3>
+                    <p class="stat-value" id="stat-shopping">0</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Plan View -->
+        <section id="view-plan" class="view hidden">
+            <h2 class="section-title">Plan Semanal</h2>
+            <div class="plan-controls">
+                <label>
+                    <input type="radio" name="plan-user" value="Carlos" checked onchange="app.renderPlan()"> Carlos
+                </label>
+                <label>
+                    <input type="radio" name="plan-user" value="Almu" onchange="app.renderPlan()"> Almu
+                </label>
+            </div>
+            <div class="plan-grid" id="plan-grid">
+                <!-- JS will populate plan here -->
+            </div>
+        </section>
+
+        <!-- Recipes View -->
+        <section id="view-recipes" class="view hidden">
+            <h2 class="section-title">Recetas</h2>
+
+            <div class="card form-card">
+                <h3>Nueva Receta</h3>
+                <input type="text" id="recipe-name" placeholder="Nombre de la receta" class="input-text">
+                <textarea id="recipe-instructions" placeholder="Instrucciones" class="input-text"></textarea>
+
+                <div id="recipe-ingredients-form">
+                    <h4>Ingredientes (Añadir)</h4>
+                    <div style="display:flex; gap:10px; margin-bottom: 10px;">
+                        <select id="recipe-ing-select" class="input-select"></select>
+                        <input type="text" id="recipe-ing-amount" placeholder="Cantidad (ej. 200g)" class="input-text">
+                        <button onclick="app.addIngredientToForm()" class="btn btn-secondary">Añadir</button>
+                    </div>
+                    <ul id="recipe-ing-list" class="simple-list"></ul>
+                </div>
+
+                <button onclick="app.saveRecipe()" class="btn btn-primary">Guardar Receta</button>
+            </div>
+
+            <div class="recipes-list card-container" id="recipes-list">
+                <!-- JS will populate recipes here -->
+            </div>
+        </section>
+
+        <!-- Ingredients View -->
+        <section id="view-ingredients" class="view hidden">
+            <h2 class="section-title">Ingredientes</h2>
+            <div class="card form-card">
+                <h3>Añadir Ingrediente</h3>
+                <div style="display:flex; gap:10px;">
+                    <input type="text" id="new-ingredient-name" placeholder="Nombre del ingrediente" class="input-text">
+                    <button onclick="app.saveIngredient()" class="btn btn-primary">Guardar</button>
+                </div>
+            </div>
+            <div class="card">
+                <ul id="ingredients-list" class="simple-list grid-list">
+                    <!-- JS will populate -->
+                </ul>
+            </div>
+        </section>
+
+        <!-- Shopping List View -->
+        <section id="view-shopping" class="view hidden">
+            <h2 class="section-title">Lista de la Compra</h2>
+            <button onclick="app.generateShoppingList()" class="btn btn-primary" style="margin-bottom: 20px;">Generar Lista desde Plan</button>
+            <div class="card">
+                <ul id="shopping-list" class="shopping-list-ui">
+                    <!-- JS will populate -->
+                </ul>
+            </div>
+        </section>
+    </main>
+
+    <script src="/static/js/main.js"></script>
+</body>
+</html>
