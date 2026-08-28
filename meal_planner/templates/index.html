@@ -143,7 +143,7 @@
                 <h2 class="section-title">Recetas</h2>
 
                 <div class="card form-card">
-                    <h3>Nueva Receta</h3>
+                    <h3 id="recipe-form-title">Nueva Receta</h3>
                     <input type="text" id="recipe-name" placeholder="Nombre de la receta" class="input-text">
                     <textarea id="recipe-instructions" placeholder="Instrucciones" class="input-text"></textarea>
 
@@ -157,7 +157,10 @@
                         <ul id="recipe-ing-list" class="simple-list"></ul>
                     </div>
 
-                    <button onclick="app.saveRecipe()" class="btn btn-dark">Guardar Receta</button>
+                    <div style="display: flex; gap: 10px;">
+                        <button onclick="app.saveRecipe()" class="btn btn-dark">Guardar Receta</button>
+                        <button id="cancel-recipe-btn" onclick="app.cancelEdit()" class="btn btn-secondary" style="display: none;">Cancelar</button>
+                    </div>
                 </div>
 
                 <div class="recipes-list card-container" id="recipes-list">
