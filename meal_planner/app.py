@@ -65,6 +65,49 @@ def get_recipes():
         result.append(r)
     return jsonify(result)
 
+@app.route('/api/recipes/<int:recipe_id>', methods=['DELETE'])
+def delete_recipe(recipe_id):
+    db = get_db()
+    try:
+        cursor = db.cursor()
+        cursor.execute('DELETE FROM weekly_plan WHERE recipe_id = ?', (recipe_id,))
+        cursor.execute('DELETE FROM recipe_ingredients WHERE recipe_id = ?', (recipe_id,))
+        cursor.execute('DELETE FROM recipes WHERE id = ?', (recipe_id,))
+        db.commit()
+        return jsonify({'success': True}), 200
+    except Exception as e:
+        db.rollback()
+        return jsonify({'error': str(e)}), 400
+
+@app.route('/api/recipes/<int:recipe_id>', methods=['PUT'])
+def update_recipe(recipe_id):
+    data = request.json
+    name = data.get('name')
+    instructions = data.get('instructions', '')
+    ingredients = data.get('ingredients', [])
+
+    if not name:
+        return jsonify({'error': 'Name is required'}), 400
+
+    db = get_db()
+    try:
+        cursor = db.cursor()
+        cursor.execute('UPDATE recipes SET name = ?, instructions = ? WHERE id = ?', (name, instructions, recipe_id))
+
+        cursor.execute('DELETE FROM recipe_ingredients WHERE recipe_id = ?', (recipe_id,))
+        for ing in ingredients:
+            cursor.execute('INSERT INTO recipe_ingredients (recipe_id, ingredient_id, amount) VALUES (?, ?, ?)',
+                           (recipe_id, ing['ingredient_id'], ing.get('amount', '')))
+
+        db.commit()
+        return jsonify({'id': recipe_id, 'name': name}), 200
+    except sqlite3.IntegrityError:
+        db.rollback()
+        return jsonify({'error': 'Invalid ingredient'}), 400
+    except Exception as e:
+        db.rollback()
+        return jsonify({'error': str(e)}), 400
+
 @app.route('/api/recipes', methods=['POST'])
 def add_recipe():
     data = request.json

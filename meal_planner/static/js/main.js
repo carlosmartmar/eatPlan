@@ -3,7 +3,8 @@ const app = {
         ingredients: [],
         recipes: [],
         currentPlanUser: 'Carlos',
-        recipeFormIngredients: []
+        recipeFormIngredients: [],
+        editingRecipeId: null
     },
 
     init() {
@@ -133,21 +134,77 @@ const app = {
             ingredients: this.data.recipeFormIngredients
         };
 
-        const res = await fetch('/api/recipes', {
-            method: 'POST',
+        let url = '/api/recipes';
+        let method = 'POST';
+
+        if (this.data.editingRecipeId) {
+            url = `/api/recipes/${this.data.editingRecipeId}`;
+            method = 'PUT';
+        }
+
+        const res = await fetch(url, {
+            method: method,
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify(payload)
         });
 
         if (res.ok) {
-            document.getElementById('recipe-name').value = '';
-            document.getElementById('recipe-instructions').value = '';
-            this.data.recipeFormIngredients = [];
-            this.renderRecipeFormIngredients();
+            this.cancelEdit();
             this.fetchRecipes();
         } else {
             alert('Error al guardar receta');
         }
+    },
+
+    cancelEdit() {
+        this.data.editingRecipeId = null;
+        document.getElementById('recipe-name').value = '';
+        document.getElementById('recipe-instructions').value = '';
+        this.data.recipeFormIngredients = [];
+        this.renderRecipeFormIngredients();
+
+        const formTitle = document.getElementById('recipe-form-title');
+        if (formTitle) formTitle.textContent = 'Nueva Receta';
+
+        const cancelBtn = document.getElementById('cancel-recipe-btn');
+        if (cancelBtn) cancelBtn.style.display = 'none';
+    },
+
+    async deleteRecipe(recipeId) {
+        if (!confirm('¿Estás seguro de que quieres eliminar esta receta?')) return;
+        const res = await fetch(`/api/recipes/${recipeId}`, { method: 'DELETE' });
+        if (res.ok) {
+            this.fetchRecipes();
+        } else {
+            alert('Error al eliminar receta');
+        }
+    },
+
+    editRecipe(recipeId) {
+        const recipe = this.data.recipes.find(r => r.id === recipeId);
+        if (!recipe) return;
+
+        this.data.editingRecipeId = recipeId;
+        document.getElementById('recipe-name').value = recipe.name;
+        document.getElementById('recipe-instructions').value = recipe.instructions || '';
+
+        // Deep copy the ingredients so we don't modify the original until save
+        this.data.recipeFormIngredients = recipe.ingredients.map(ing => ({
+            ingredient_id: ing.id || ing.ingredient_id,
+            name: ing.name,
+            amount: ing.amount
+        }));
+
+        this.renderRecipeFormIngredients();
+
+        const formTitle = document.getElementById('recipe-form-title');
+        if (formTitle) formTitle.textContent = 'Editar Receta';
+
+        const cancelBtn = document.getElementById('cancel-recipe-btn');
+        if (cancelBtn) cancelBtn.style.display = 'inline-block';
+
+        // Scroll to form
+        document.getElementById('view-recipes').scrollIntoView({ behavior: 'smooth' });
     },
 
     async fetchRecipes() {
@@ -172,6 +229,10 @@ const app = {
                 <p><strong>Instrucciones:</strong> ${recipe.instructions || 'N/A'}</p>
                 <p><strong>Ingredientes:</strong></p>
                 <ul>${ingsHtml}</ul>
+                <div style="margin-top: 15px; display: flex; gap: 10px;">
+                    <button class="btn btn-secondary" onclick="app.editRecipe(${recipe.id})">Editar</button>
+                    <button class="btn btn-secondary" onclick="app.deleteRecipe(${recipe.id})" style="color: #ff4d4d; border-color: #ff4d4d;">Eliminar</button>
+                </div>
             `;
             container.appendChild(card);
         });
